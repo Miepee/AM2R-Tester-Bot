@@ -1,6 +1,5 @@
 extern crate lazy_static;
 
-mod latex_utils;
 mod bot_utils;
 mod matrix_utils;
 
@@ -14,7 +13,7 @@ async fn on_room_message(event: OriginalSyncRoomMessageEvent, room: Room) {
     let Room::Joined(room) = room else { return };
     let MessageType::Text(text_content) = event.content.msgtype else { return };
     if let Some(command_message) = text_content.body.strip_prefix('!'){
-        let command_slice = if command_message.len() >=5 {&command_message[0..5]} else {command_message};
+        let command_slice = /*if command_message.len() >=5 {&command_message[0..5]} else */{command_message};
         let split_pos = command_slice.find(' ').unwrap_or(command_slice.len());
         let (match_slice, message_string) = command_message.split_at(split_pos);
 
@@ -37,10 +36,11 @@ async fn login_and_sync(
     let response = client.sync_once(SyncSettings::default()).await.unwrap();
     client.add_event_handler(move |ev, room| on_room_message(ev, room));
     let rooms = client.invited_rooms();
+    /*
     for room in rooms{ // TODO don't blindly join every invite
         println!("user_id: {}, room_id: {}", room.client().user_id().unwrap(), room.room_id());
         client.join_room_by_id(room.room_id()).await.expect("Joining room failed!");
-    }
+    }*/
     //client.join_room_by_id()
     let settings = SyncSettings::default().token(response.next_batch);
     client.sync(settings).await?;
